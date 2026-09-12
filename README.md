@@ -5,7 +5,9 @@ Search by *meaning*, not keywords — a query like "app keeps crashing after upd
 relevant reviews even when they use completely different words ("frozen", "won't open",
 "broken since latest version").
 
-**Live demo:** https://amazon-review-semantic-search-api.onrender.com/docs
+**Live demo:** https://mikaelson-mulumba.github.io/amazon-review-semantic-search/
+
+**Live API:** https://amazon-review-semantic-search-api.onrender.com/docs
 
 ---
 
