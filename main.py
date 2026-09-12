@@ -8,7 +8,7 @@ import os
 import torch
 
 
-torch.set_num_threads(1)
+
 app = FastAPI(title="Amazon Software Reviews Semantic Search")
 app.add_middleware(
     CORSMiddleware,
