@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Amazon Software Reviews — Semantic Search</title>
+<style>
+  body {
+    font-family: -apple-system, sans-serif;
+    max-width: 700px;
+    margin: 60px auto;
+    padding: 0 20px;
+    background: #f7f7f8;
+    color: #1a1a1a;
+  }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  p.subtitle { color: #666; margin-top: 0; margin-bottom: 24px; }
+  .search-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  input {
+    flex: 1;
+    padding: 12px 14px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  button {
+    padding: 12px 20px;
+    font-size: 15px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  button:hover { background: #1d4ed8; }
+  .result {
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .result h3 { margin: 0 0 6px 0; font-size: 16px; }
+  .meta { color: #888; font-size: 13px; margin-bottom: 8px; }
+  .score {
+    display: inline-block;
+    background: #eef2ff;
+    color: #4338ca;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+  #loading { color: #888; font-style: italic; }
+</style>
+</head>
+<body>
+
+<h1>Amazon Software Reviews Search</h1>
+<p class="subtitle">Semantic search over 45,000+ real reviews — search by meaning, not keywords.</p>
+
+<div class="search-bar">
+  <input type="text" id="queryInput" placeholder="e.g. app keeps crashing after update" />
+  <button onclick="runSearch()">Search</button>
+</div>
+
+<div id="results"></div>
+
+<script>
+async function runSearch() {
+  const query = document.getElementById('queryInput').value.trim();
+  const resultsDiv = document.getElementById('results');
+  if (!query) return;
+
+  resultsDiv.innerHTML = '<p id="loading">Searching...</p>';
+
+  try {
+    const response = await fetch('http://127.0.0.1:8000/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: query, top_k: 5 })
+    });
+
+    const data = await response.json();
+    resultsDiv.innerHTML = '';
+
+    if (data.length === 0) {
+      resultsDiv.innerHTML = '<p>No results found.</p>';
+      return;
+    }
+
+    data.forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'result';
+      div.innerHTML = `
+        <h3>${r.title} <span class="score">${(r.similarity * 100).toFixed(1)}% match</span></h3>
+        <div class="meta">Rating: ${r.rating} ★ · ASIN: ${r.asin}</div>
+        <p>${r.text}</p>
+      `;
+      resultsDiv.appendChild(div);
+    });
+  } catch (err) {
+    resultsDiv.innerHTML = '<p style="color:red">Error connecting to the API. Is it running?</p>';
+  }
+}
+
+// Allow pressing Enter to search
+document.getElementById('queryInput').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') runSearch();
+});
+</script>
+
+</body>
+</html>
